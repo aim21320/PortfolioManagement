@@ -24,11 +24,11 @@ public class MarketDataController {
         String stockInfo;
         try {
             stockInfo = marketData.getStockInfo();
+            System.err.println("current api call cnt: "+marketData.getApiCallCnt());
             return new ResponseEntity<>(stockInfo, HttpStatus.OK);
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
     }
 
 
@@ -38,9 +38,10 @@ public class MarketDataController {
         BigDecimal stockInfo;
         try {
             stockInfo = marketData.getCurrentPrice();
+            System.err.println("current api call cnt after getStockCurrentPrice: "+marketData.getApiCallCnt());
             return new ResponseEntity<>(stockInfo, HttpStatus.OK);
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -50,9 +51,10 @@ public class MarketDataController {
         BigDecimal stockInfo;
         try {
             stockInfo = marketData.getPriceByDate();
-            return new ResponseEntity<>(stockInfo, HttpStatus.OK);
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
+            System.err.println("current api call cnt after getStockPriceForADate: "+marketData.getApiCallCnt());
+            return new ResponseEntity(stockInfo, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -62,9 +64,10 @@ public class MarketDataController {
         JSONArray stockInfo;
         try {
             stockInfo = marketData.getPricesByDates();
+            System.err.println("current api call cnt after getStockPriceForADates: "+marketData.getApiCallCnt());
             return new ResponseEntity<>(stockInfo, HttpStatus.OK);
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

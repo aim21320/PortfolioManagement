@@ -15,12 +15,19 @@ public class MarketData {
     String endDate;
     String stockSymbol;
 
+    private String host = "yahoo-finance97.p.rapidapi.com";
+    private String apiKey = "c7c0e3b178msh20f57918c6ed721p16cbcbjsnb421b5ab404c";
     public MarketData() { }
 
     public MarketData(String stockSymbol) {
         this.stockSymbol = stockSymbol;
     }
 
+    public static int getApiCallCnt() {
+        return apiCallCnt;
+    }
+
+    private static int apiCallCnt;
     public MarketData(String stockSymbol, String startDate, String endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -31,10 +38,12 @@ public class MarketData {
         String bodySymbol = "symbol=" + stockSymbol;
         HttpResponse<String> response = Unirest.post("https://yahoo-finance97.p.rapidapi.com/stock-info")
                 .header("content-type", "application/x-www-form-urlencoded")
-                .header("X-RapidAPI-Key", "b477fb1a60msha44862d1aced86bp16b30bjsn5e66f649598c")
-                .header("X-RapidAPI-Host", "yahoo-finance97.p.rapidapi.com")
+                .header("X-RapidAPI-Key", apiKey)
+                .header("X-RapidAPI-Host", host)
                 .body(bodySymbol)
                 .asString();
+        this.apiCallCnt ++;
+
         String data = response.getBody();
         return data;
     }
@@ -43,10 +52,11 @@ public class MarketData {
         String bodySymbol = "symbol=" + stockSymbol;
         HttpResponse<String> response = Unirest.post("https://yahoo-finance97.p.rapidapi.com/stock-info")
                 .header("content-type", "application/x-www-form-urlencoded")
-                .header("X-RapidAPI-Key", "b477fb1a60msha44862d1aced86bp16b30bjsn5e66f649598c")
-                .header("X-RapidAPI-Host", "yahoo-finance97.p.rapidapi.com")
+                .header("X-RapidAPI-Key", apiKey)
+                .header("X-RapidAPI-Host", host)
                 .body(bodySymbol)
                 .asString();
+        this.apiCallCnt ++;
         String data = response.getBody();
         JSONObject jsonObject = new JSONObject(data);
         BigDecimal currentPrice = jsonObject.getJSONObject("data").getBigDecimal("currentPrice");
@@ -57,10 +67,11 @@ public class MarketData {
         String bodySymbolDate = "end=" + endDate+"&symbol="+stockSymbol+"&start="+startDate;
         HttpResponse<String> response = Unirest.post("https://yahoo-finance97.p.rapidapi.com/price-customdate")
                 .header("content-type", "application/x-www-form-urlencoded")
-                .header("X-RapidAPI-Key", "b477fb1a60msha44862d1aced86bp16b30bjsn5e66f649598c")
-                .header("X-RapidAPI-Host", "yahoo-finance97.p.rapidapi.com")
+                .header("X-RapidAPI-Key", apiKey)
+                .header("X-RapidAPI-Host", host)
                 .body(bodySymbolDate)
                 .asString();
+        this.apiCallCnt ++;
         String data = response.getBody();
         JSONObject obj = new JSONObject(data);
         JSONArray arr = obj.getJSONArray("data");
@@ -73,10 +84,11 @@ public class MarketData {
         List<BigDecimal> prices = new ArrayList<>();
         HttpResponse<String> response = Unirest.post("https://yahoo-finance97.p.rapidapi.com/price-customdate")
                 .header("content-type", "application/x-www-form-urlencoded")
-                .header("X-RapidAPI-Key", "b477fb1a60msha44862d1aced86bp16b30bjsn5e66f649598c")
-                .header("X-RapidAPI-Host", "yahoo-finance97.p.rapidapi.com")
+                .header("X-RapidAPI-Key", apiKey)
+                .header("X-RapidAPI-Host", host)
                 .body(bodySymbolDate)
                 .asString();
+        this.apiCallCnt ++;
         String data = response.getBody();
         JSONObject obj = new JSONObject(data);
         JSONArray arr = obj.getJSONArray("data"); // notice that `"posts": [...]`

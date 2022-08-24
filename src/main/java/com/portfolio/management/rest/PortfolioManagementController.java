@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -32,6 +33,25 @@ public class PortfolioManagementController {
         }
     }
 
+    @GetMapping(value = "getUserIDUsingEmail/{email}/{passWord}")
+    public ResponseEntity getUserIDUsingEmail(@PathVariable String email, @PathVariable String passWord) {
+        Optional<User> user  = portfolioManagementService.fetchUserByEmail(email);
+        if (user.isPresent()) {
+            User curUser = user.get();
+            String curPassWord = curUser.getUserPassword();
+            if (!curPassWord.equals(passWord)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Email and password does not match");
+            }
+            int userID = curUser.getUserID();
+            return new ResponseEntity(userID, HttpStatus.OK);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User does not exist");
+        }
+    }
+
     //http://localhost:8080/adduser/K1@gmail.com/Kate/1111
     //http://localhost:8080/?email=K1@gmail.com&name=Kate&passWord=1111
     @PostMapping(value = "/addUser/{email}/{userName}/{passWord}")
@@ -47,11 +67,24 @@ public class PortfolioManagementController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/updateBalance/{userID}/{balance}")
-    public ResponseEntity changeBalance(@PathVariable int userID, @PathVariable double balance){
-        User user = portfolioManagementService.updateUserBalance(userID, balance);
+    @PutMapping(value = "/addBalance/{userID}/{addAmount}")
+    public ResponseEntity addBalance(@PathVariable int userID, @PathVariable BigDecimal addAmount){
+        User user = portfolioManagementService.addUserBalance(userID, addAmount);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+    @PutMapping(value = "/withDrawBalance/{userID}/{withdrawAmount}")
+    public ResponseEntity withDrawBalance(@PathVariable int userID, @PathVariable BigDecimal withdrawAmount){
+        User user = null;
+        try {
+            user = portfolioManagementService.withdrawUserBalance(userID, withdrawAmount);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Insufficient balance. Withdraw is forbidden." );
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
 
 
 

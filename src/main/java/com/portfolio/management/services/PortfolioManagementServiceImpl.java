@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 @Service
 public class PortfolioManagementServiceImpl implements PortfolioManagementService {
@@ -19,6 +20,11 @@ public class PortfolioManagementServiceImpl implements PortfolioManagementServic
     // Optional -> when not able to find this id, return null
     public Optional<User> fetchUserById(int userID){
         Optional<User> user = portfolioManagementRepository.findById(userID);
+        return user;
+    }
+
+    public Optional<User> fetchUserByEmail(String email){
+        Optional<User> user = Optional.ofNullable(portfolioManagementRepository.findByEmail(email));
         return user;
     }
 
@@ -39,13 +45,41 @@ public class PortfolioManagementServiceImpl implements PortfolioManagementServic
         return curUser;
     }
 
-    public User updateUserBalance(int userID, double balance) {
+    public User updateUserBalance(int userID, BigDecimal balance) {
         Optional<User> user = portfolioManagementRepository.findById(userID);
         User curUser = null;
         if(user.isPresent()) {
             curUser = user.get();
             curUser.setBalance(balance);
             portfolioManagementRepository.save(curUser);
+        }
+        return curUser;
+    }
+
+    public User addUserBalance(int userID, BigDecimal addAmount) {
+        Optional<User> user = portfolioManagementRepository.findById(userID);
+        User curUser = null;
+        if(user.isPresent()) {
+            curUser = user.get();
+            curUser.setBalance(curUser.getBalance().add(addAmount));
+            portfolioManagementRepository.save(curUser);
+        }
+        return curUser;
+    }
+
+    public User withdrawUserBalance(int userID, BigDecimal withdrawAmount) throws Exception {
+        Optional<User> user = portfolioManagementRepository.findById(userID);
+        User curUser = null;
+        BigDecimal curBalance;
+        if(user.isPresent()) {
+            curUser = user.get();
+            curBalance = curUser.getBalance();
+            if (curBalance.compareTo(withdrawAmount) < 0) {
+                throw new Exception();
+            } else {
+                curUser.setBalance(curBalance.subtract(withdrawAmount));
+                portfolioManagementRepository.save(curUser);
+            }
         }
         return curUser;
     }
@@ -58,15 +92,15 @@ public class PortfolioManagementServiceImpl implements PortfolioManagementServic
      * get current balance of the user using the provided userID
      * @param userID
      */
-    public double getBalance(int userID) {
+    public BigDecimal getBalance(int userID) {
         Optional<User> user = portfolioManagementRepository.findById(userID);
         User curUser = null;
         if(user.isPresent()) {
             curUser = user.get();
-            double balance = curUser.getBalance();
+            BigDecimal balance = curUser.getBalance();
             return balance;
         }
-        return -0.1;
+        return null;
     }
 
 }
