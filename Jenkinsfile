@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 def projectName = 'portfolio'
-=======
-def projectName = 'portfoliomanagement'
->>>>>>> 020864ad33b1e1d26d719c56be7cff08f908302f
 def version = "0.0.${currentBuild.number}"
 def dockerImageTag = "${projectName}:${version}"
 
